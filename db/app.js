@@ -13,15 +13,14 @@ app.get("/", (req, res) => {
 
 app.get("/newSnapshot/:url?", async (req, res) => {
   const { url } = req.params;
+  encodedUrl = encodeURIComponent(url);
 
-  const data = await fetch(
-    `https://localhost:5000/archive?url=${encodeURI(url)}`
-  );
+  const data = await fetch(`https://localhost:5000/archive?url=${encodedUrl}`);
   const { timestamp, location } = await data.json();
 
   const orbitdb = await OrbitDB.createInstance(ipfs);
 
-  const db = await orbitdb.keyvalue("snapshot-details-" + url.toString());
+  const db = await orbitdb.keyvalue("snapshot-details-" + encodedUrl);
   await db.load();
 
   const hash = await db.put(timestamp, { location });
