@@ -5,6 +5,18 @@ const app = express();
 const port = 3000;
 
 const ipfs = IpfsClient.create();
+// const projectId = "1zwEmKfT6i3cKKdlFee4rTQyHB8";
+// const projectSecret = "a066b3b0b6fefb67c3c8937f63a045c5";
+// const auth = projectId + ":" + projectSecret;
+
+// const ipfs = IpfsClient.create({
+//   host: "ipfs.infura.io",
+//   port: 5001,
+//   protocol: "https",
+//   headers: {
+//     authorization: auth,
+//   },
+// });
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -16,20 +28,6 @@ app.get("/newSnapshot/:url?", async (req, res) => {
 
   const timestamp = Date.now();
   const snapshotHash = null;
-
-  //   const projectId = "1zwEmKfT6i3cKKdlFee4rTQyHB8";
-  //   const projectSecret = "a066b3b0b6fefb67c3c8937f63a045c5";
-  //   const auth =
-  //     "Basic " + Buffer.from(projectId + ":" + projectSecret).toString("base64");
-
-  //   const ipfs = IpfsClient.create({
-  //     host: "ipfs.infura.io",
-  //     port: 5001,
-  //     protocol: "https",
-  //     headers: {
-  //       authorization: auth,
-  //     },
-  //   });
 
   const orbitdb = await OrbitDB.createInstance(ipfs);
 
