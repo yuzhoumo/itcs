@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS, cross_origin
 
 import urllib.parse
 import subprocess
@@ -6,7 +7,7 @@ import os
 import time
 
 app = Flask(__name__)
-
+CORS(app)
 
 @app.route('/')
 def hello_world():
