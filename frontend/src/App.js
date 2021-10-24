@@ -85,9 +85,9 @@ function App() {
     <ChakraProvider>
       <Grid h="100vh" templateColumns="repeat(3, 1fr)">
         <GridItem colSpan={2} bg="#eee">
-          {validURL(sourceURL) ? (
+          {validURL(sourceURL || currentURL) ? (
             <AspectRatio ratio={5} h="100vh">
-              <iframe title="snapshot" src={sourceURL} />
+              <iframe title="snapshot" src={sourceURL || currentURL} />
             </AspectRatio>
           ) : (
             <VStack>
