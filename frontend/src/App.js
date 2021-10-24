@@ -20,7 +20,15 @@ import {
 import { validURL } from './utils';
 import Comment from './components/Comment';
 
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  addDoc,
+  onSnapshot,
+  doc,
+  query,
+} from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 
 const firebaseConfig = {
@@ -39,14 +47,20 @@ function App() {
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
+  const submitComment = async text => {
+    if (text)
+      await addDoc(collection(db, encodeURIComponent(currentURL)), {
+        text,
+      });
+  };
+
   useEffect(() => {
-    if (currentURL)
-      (async () => {
-        const querySnapshot = await getDocs(
-          collection(db, encodeURIComponent(currentURL))
-        );
+    if (currentURL) {
+      const q = query(collection(db, encodeURIComponent(currentURL)));
+      const unsubscribe = onSnapshot(q, querySnapshot => {
         setComments(querySnapshot.docs.map(doc => doc.data()));
-      })();
+      });
+    }
   }, [db, currentURL]);
   return (
     <ChakraProvider>
@@ -108,12 +122,15 @@ function App() {
               placeholder="Post a comment"
               onKeyDown={e => {
                 if (e.key === 'Enter' && validURL(currentURL)) {
-                  // TODO
+                  console.log('dsfsdf');
+                  submitComment(e.currentTarget.value);
+                  e.currentTarget.value = '';
                 }
               }}
             />
             <Button>Submit</Button>
           </HStack>
+          {JSON.stringify(comments)}
         </GridItem>
       </Grid>
     </ChakraProvider>
