@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ChakraProvider,
   Box,
@@ -16,14 +16,36 @@ import {
   theme,
   useToast,
 } from '@chakra-ui/react';
-import { ColorModeSwitcher } from './ColorModeSwitcher';
-import { Logo } from './Logo';
 import { validURL } from './utils';
+
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyA_Hujux8zJDUj_KZNTGY3frZnRWJ2UjP0',
+  authDomain: 'itcs-f33ec.firebaseapp.com',
+  projectId: 'itcs-f33ec',
+  storageBucket: 'itcs-f33ec.appspot.com',
+  messagingSenderId: '569866295101',
+  appId: '1:569866295101:web:02ae668ec42301da071754',
+};
 
 function App() {
   const [currentURL, setCurrentURL] = useState();
-  const toast = useToast();
+  const [comments, setComments] = useState();
 
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  useEffect(() => {
+    if (currentURL)
+      (async () => {
+        const querySnapshot = await getDocs(
+          collection(db, encodeURIComponent(currentURL))
+        );
+        setComments(querySnapshot.docs.map(doc => doc.data()));
+      })();
+  }, [db, currentURL]);
   return (
     <ChakraProvider>
       <Grid h="100vh" templateColumns="repeat(3, 1fr)">
@@ -51,6 +73,7 @@ function App() {
             }}
             isInvalid={currentURL !== null && !validURL(currentURL)}
           />
+          {JSON.stringify(comments)}
         </GridItem>
       </Grid>
     </ChakraProvider>
