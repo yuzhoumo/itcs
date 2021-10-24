@@ -8,6 +8,11 @@ import time
 app = Flask(__name__)
 
 
+@app.route('/')
+def hello_world():
+    return "You have reached the archiver server."
+
+
 @app.route('/archive', methods = ['GET'])
 def archive_site():
 
