@@ -14,6 +14,7 @@ import {
   Select,
   FormControl,
   AspectRatio,
+  VStack,
   theme,
   useToast,
 } from '@chakra-ui/react';
@@ -70,7 +71,14 @@ function App() {
             <AspectRatio ratio={5} h="100vh">
               <iframe title="snapshot" src={currentURL} />
             </AspectRatio>
-          ) : null}
+          ) : (
+            <VStack>
+              <Heading fontSize={80} mt="30vh">
+                🕓 🕕 🕥 🕛
+              </Heading>
+              <Heading fontSize={30}>Inter-Timeline Commenting System</Heading>
+            </VStack>
+          )}
         </GridItem>
         <GridItem boxShadow="2xl" colSpan={1} p={4}>
           <Heading
