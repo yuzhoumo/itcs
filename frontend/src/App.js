@@ -4,19 +4,13 @@ import {
   Box,
   Button,
   Text,
-  Link,
   HStack,
-  Code,
   Grid,
   GridItem,
   Heading,
   Input,
-  Select,
-  FormControl,
   AspectRatio,
   VStack,
-  theme,
-  useToast,
 } from '@chakra-ui/react';
 import { validURL } from './utils';
 import Comment from './components/Comment';
@@ -24,11 +18,11 @@ import Comment from './components/Comment';
 import {
   getFirestore,
   collection,
-  getDocs,
   addDoc,
   onSnapshot,
   doc,
   query,
+  updateDoc,
 } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 
@@ -43,20 +37,44 @@ const firebaseConfig = {
 
 function App() {
   const [currentURL, setCurrentURL] = useState();
+  const [sourceURL, setSourceURL] = useState();
   const [comments, setComments] = useState();
+  const [loadingItem, setLoadingItem] = useState();
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
   const submitComment = async text => {
-    if (text)
-      await addDoc(collection(db, encodeURIComponent(currentURL)), {
+    if (text) {
+      const doc = await addDoc(collection(db, encodeURIComponent(currentURL)), {
         text,
       });
+      saveSnapshot(doc.id);
+    }
+  };
+
+  const saveSnapshot = async id => {
+    setLoadingItem(id);
+    if (validURL(currentURL)) {
+      const data = await fetch(
+        `https://jolly-sheep-69.loca.lt/archive?url=${encodeURIComponent(
+          currentURL
+        )}`
+      );
+
+      const realData = await data.json();
+
+      const { timestamp, location } = realData;
+      await updateDoc(doc(db, encodeURIComponent(currentURL), id), {
+        timestamp,
+        location,
+      });
+    }
+    setLoadingItem(null);
   };
 
   useEffect(() => {
-    if (currentURL) {
+    if (validURL(currentURL)) {
       const q = query(collection(db, encodeURIComponent(currentURL)));
       const unsubscribe = onSnapshot(q, querySnapshot => {
         setComments(querySnapshot.docs.map(doc => doc.data()));
@@ -67,9 +85,9 @@ function App() {
     <ChakraProvider>
       <Grid h="100vh" templateColumns="repeat(3, 1fr)">
         <GridItem colSpan={2} bg="#eee">
-          {validURL(currentURL) ? (
+          {validURL(sourceURL) ? (
             <AspectRatio ratio={5} h="100vh">
-              <iframe title="snapshot" src={currentURL} />
+              <iframe title="snapshot" src={sourceURL} />
             </AspectRatio>
           ) : (
             <VStack>
@@ -109,20 +127,18 @@ function App() {
             bg="#eee"
             overflow="scroll"
           >
-            <Comment
-              text="The quick brown fox jumps over the lazy dog."
-              time={1630604985}
-              link="https://example.com"
-              setURL={setCurrentURL}
-            ></Comment>
-            <Comment
-              text="The quick brown fox jumps over the lazy dog."
-              time={1630604985}
-              link="https://example.com"
-              setURL={setCurrentURL}
-            ></Comment>
+            {comments &&
+              comments
+                .sort((a, b) => a.timestamp > b.timestamp)
+                .map(comment => (
+                  <Comment
+                    text={comment.text}
+                    time={comment.timestamp || Date.now()}
+                    link={'https://ipfs.io/ipfs/' + comment.location}
+                    setURL={setSourceURL}
+                  ></Comment>
+                ))}
           </Box>
-
           <HStack mt={5}>
             <Input
               variant="outline"
@@ -138,7 +154,14 @@ function App() {
             />
             <Button>Submit</Button>
           </HStack>
-          {JSON.stringify(comments)}
+          {sourceURL && (
+            <Box maxW={'30vw'}>
+              <Text pt={5} pl={2}>
+                Source:
+                {JSON.stringify(sourceURL)}
+              </Text>
+            </Box>
+          )}
         </GridItem>
       </Grid>
     </ChakraProvider>
