@@ -8,6 +8,12 @@ import {
   Flex,
   Stack,
   Box,
+  SimpleGrid,
+  FormControl,
+  Input,
+  Button,
+  useControllableState,
+  getElementById,
 } from "@chakra-ui/react";
 
 // 2. Extend the theme to include custom colors, fonts, etc
@@ -67,13 +73,44 @@ function App() {
             <Stack
               w="30%"
               h="full"
-              p={10}
-              spacing={10}
+              p={1}
+              spacing={1}
               alignItems="flex-start"
               bg="gray.800"
               rounded="md"
             >
-              <b1>Commenting</b1>
+              <Stack h="70%" rounded="md" background="gray">
+                <Box
+                  overflowX="auto"
+                  css={{
+                    "&::-webkit-scrollbar": {
+                      width: "4px",
+                    },
+                    "&::-webkit-scrollbar-track": {
+                      width: "6px",
+                    },
+                    "&::-webkit-scrollbar-thumb": {
+                      background: "white",
+                      borderRadius: "24px",
+                    },
+                  }}
+                >
+                  <b1 id="CommentSpace" w="full" h="70%">
+                    Comment Comment Comment Comment Comment Comment Comment
+                    Comment Comment Comment Comment Comment Comment Comment
+                    Comment Comment Comment Comment Comment Comment Comment
+                    Comment Comment Comment Comment Comment Comment
+                  </b1>
+                </Box>
+              </Stack>
+              <Stack h="full" w="full" rounded="md">
+                <SimpleGrid columns={1} spacing={1}>
+                  <FormControl>
+                    <Input placeholder="Name" h="30%" id="Name" />
+                    <Input placeholder="Comment" h="50%" id="Comment" />
+                  </FormControl>
+                </SimpleGrid>
+              </Stack>
             </Stack>
           </Flex>
         </Container>
