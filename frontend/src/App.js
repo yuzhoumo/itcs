@@ -57,9 +57,7 @@ function App() {
     setLoadingItem(id);
     if (validURL(currentURL)) {
       const data = await fetch(
-        `https://jolly-sheep-69.loca.lt/archive?url=${encodeURIComponent(
-          currentURL
-        )}`
+        `http://localhost:5000/archive?url=${encodeURIComponent(currentURL)}`
       );
 
       const realData = await data.json();
@@ -111,7 +109,10 @@ function App() {
             variant="outline"
             placeholder="Website URL"
             onKeyDown={e => {
-              if (e.key === 'Enter') setCurrentURL(e.currentTarget.value);
+              if (e.key === 'Enter') {
+                setCurrentURL(e.currentTarget.value);
+                setSourceURL(e.currentTarget.value);
+              }
             }}
             isInvalid={currentURL !== null && !validURL(currentURL)}
           />
@@ -129,12 +130,12 @@ function App() {
           >
             {comments &&
               comments
-                .sort((a, b) => a.timestamp > b.timestamp)
+                .sort((a, b) => a.timestamp - b.timestamp)
                 .map(comment => (
                   <Comment
                     text={comment.text}
                     time={comment.timestamp || Date.now()}
-                    link={'https://ipfs.io/ipfs/' + comment.location}
+                    link={'http://localhost:8080/ipfs/' + comment.location}
                     setURL={setSourceURL}
                   ></Comment>
                 ))}
